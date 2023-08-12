@@ -80,7 +80,6 @@ void writeFileJson(fs::FS &fs, const char *path, const char *property,
     return;
   }
 
-  // jsonWifi.clear();
   // Creating JSON record
   jsonWifi[property] = value;
   // Writing data to JSON file

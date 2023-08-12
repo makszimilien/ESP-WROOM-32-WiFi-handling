@@ -98,7 +98,7 @@ bool initWiFi() {
 
 void setup() {
 
-  // // Enable the Watchdog Timer
+  // Enable the Watchdog Timer
   esp_task_wdt_init(WATCHDOG_TIMEOUT, true);
   esp_task_wdt_add(NULL); // Attach the current task to the watchdog
 
