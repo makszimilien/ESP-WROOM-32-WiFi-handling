@@ -206,9 +206,10 @@ void loop() {
   // Reset the Watchdog Timer to prevent a system reset
   esp_task_wdt_reset();
 
+  // Resboot ESP after SSID and PASS were set
   if (restart) {
     delay(5000);
-    // ESP.restart();
+    ESP.restart();
   }
   // delay(1000);
   // Serial.println(readFileJson(SPIFFS, jsonWifiPath, "SSID"));
