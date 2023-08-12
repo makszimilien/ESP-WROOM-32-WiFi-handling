@@ -121,10 +121,6 @@ void setup() {
   Serial.println(ip);
   Serial.println(gateway);
 
-  // Initialize ArduinoOTA with a hostname and start
-  ArduinoOTA.setHostname(hostname);
-  ArduinoOTA.begin();
-
   // Set up WebSocket event handler
   ws.onEvent(onWsEvent);
 
@@ -193,10 +189,13 @@ void setup() {
     });
     server.begin();
   }
+  // Initialize ArduinoOTA with a hostname and start
+  ArduinoOTA.setHostname(hostname);
+  ArduinoOTA.onStart([]() { Serial.println("OTA update started"); });
+  ArduinoOTA.begin();
 }
 
 void loop() {
-
   // Handle Over-The-Air (OTA) updates for the Arduino board
   ArduinoOTA.handle();
 
