@@ -200,7 +200,7 @@ void loop() {
     delay(5000);
     // ESP.restart();
   }
-  delay(1000);
-  Serial.println(readFileJson(LittleFS, jsonWifiPath, "SSID"));
-  Serial.println(readFileJson(LittleFS, jsonWifiPath, "PASS"));
+  // delay(1000);
+  // Serial.println(readFileJson(LittleFS, jsonWifiPath, "SSID"));
+  // Serial.println(readFileJson(LittleFS, jsonWifiPath, "PASS"));
 }
