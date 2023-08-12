@@ -19,7 +19,7 @@ void initFS() {
 String readFile(fs::FS &fs, const char *path) {
   Serial.printf("Reading file: %s\r\n", path);
 
-  File file = fs.open(path, "r");
+  File file = fs.open(path);
   if (!file || file.isDirectory()) {
     Serial.println("- failed to open file for reading");
     return String();
@@ -30,7 +30,6 @@ String readFile(fs::FS &fs, const char *path) {
     fileContent = file.readStringUntil('\n');
     break;
   }
-  file.close();
   return fileContent;
 }
 
@@ -38,7 +37,7 @@ String readFile(fs::FS &fs, const char *path) {
 String readFileJson(fs::FS &fs, const char *path, const char *property) {
   Serial.printf("Reading file: %s\r\n", path);
 
-  File file = fs.open(path, "r");
+  File file = fs.open(path);
   if (!file || file.isDirectory()) {
     Serial.println("- failed to open file for reading");
     return String();
@@ -51,7 +50,6 @@ String readFileJson(fs::FS &fs, const char *path, const char *property) {
   deserializeJson(jsonWifi, buf.get());
 
   String value = jsonWifi[property];
-  file.close();
   return value;
 }
 
@@ -59,7 +57,7 @@ String readFileJson(fs::FS &fs, const char *path, const char *property) {
 void writeFile(fs::FS &fs, const char *path, const char *message) {
   Serial.printf("Writing file: %s\r\n", path);
 
-  File file = fs.open(path, "w");
+  File file = fs.open(path, FILE_WRITE);
   if (!file) {
     Serial.println("- failed to open file for writing");
     return;
@@ -69,7 +67,6 @@ void writeFile(fs::FS &fs, const char *path, const char *message) {
   } else {
     Serial.println("- frite failed");
   }
-  file.close();
 }
 
 // Write JSON file to SPIFFS
@@ -77,7 +74,7 @@ void writeFileJson(fs::FS &fs, const char *path, const char *property,
                    const char *value) {
   Serial.printf("Writing file: %s\r\n", path);
 
-  File file = fs.open(path, "w");
+  File file = fs.open(path, FILE_WRITE);
   if (!file) {
     Serial.println("- failed to open file for writing");
     return;
@@ -88,5 +85,4 @@ void writeFileJson(fs::FS &fs, const char *path, const char *property,
   jsonWifi[property] = value;
   // Writing data to JSON file
   serializeJson(jsonWifi, file);
-  file.close();
 }
