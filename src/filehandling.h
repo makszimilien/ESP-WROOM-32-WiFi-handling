@@ -1,8 +1,8 @@
 #ifndef FILEHANDLING_H // Inclusion Guards
 #define FILEHANDLING_H
 
+#include "SPIFFS.h"
 #include <Arduino.h>
-#include <LittleFS.h>
 
 void initFS();
 String readFile(fs::FS &fs, const char *path);

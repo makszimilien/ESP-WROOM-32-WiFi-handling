@@ -1,21 +1,21 @@
+#include "SPIFFS.h"
 #include "filehandling.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <LittleFS.h>
 
 // Variable for JSON document
 StaticJsonDocument<100> jsonWifi;
 
-// Initialize LittleFS
+// Initialize SPIFFS
 void initFS() {
-  if (!LittleFS.begin()) {
-    Serial.println("An error has occurred while mounting LittleFS");
+  if (!SPIFFS.begin(true)) {
+    Serial.println("An error has occurred while mounting SPIFFS");
   } else {
-    Serial.println("LittleFS mounted successfully");
+    Serial.println("SPIFFS mounted successfully");
   }
 }
 
-// Read File from LittleFS
+// Read File from SPIFFS
 String readFile(fs::FS &fs, const char *path) {
   Serial.printf("Reading file: %s\r\n", path);
 
@@ -34,7 +34,7 @@ String readFile(fs::FS &fs, const char *path) {
   return fileContent;
 }
 
-// Read JSON File from LittleFS
+// Read JSON File from SPIFFS
 String readFileJson(fs::FS &fs, const char *path, const char *property) {
   Serial.printf("Reading file: %s\r\n", path);
 
@@ -55,7 +55,7 @@ String readFileJson(fs::FS &fs, const char *path, const char *property) {
   return value;
 }
 
-// Write file to LittleFS
+// Write file to SPIFFS
 void writeFile(fs::FS &fs, const char *path, const char *message) {
   Serial.printf("Writing file: %s\r\n", path);
 
@@ -72,7 +72,7 @@ void writeFile(fs::FS &fs, const char *path, const char *message) {
   file.close();
 }
 
-// Write JSON file to LittleFS
+// Write JSON file to SPIFFS
 void writeFileJson(fs::FS &fs, const char *path, const char *property,
                    const char *value) {
   Serial.printf("Writing file: %s\r\n", path);

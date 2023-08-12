@@ -1,15 +1,20 @@
+#include "SPIFFS.h"
 #include "filehandling.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <ArduinoOTA.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <LittleFS.h>
 #include <WiFi.h>
 #include <esp_task_wdt.h>
 
 // Watchdog timeout in milliseconds
 const int WATCHDOG_TIMEOUT = 8000000;
+
+// WiFi timer variables
+unsigned long previousMillis = 0;
+const long interval = 10000;
+unsigned long currentMillis = 0;
 
 // Search for parameter in HTTP POST request
 const char *PARAM_INPUT_1 = "ssid";
@@ -78,10 +83,15 @@ bool initWiFi() {
   WiFi.begin(ssid.c_str(), pass.c_str());
 
   Serial.println("Connecting to WiFi...");
-  delay(20000);
-  if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("Failed to connect.");
-    return false;
+  currentMillis = millis();
+  previousMillis = currentMillis;
+
+  while (WiFi.status() != WL_CONNECTED) {
+    currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+      Serial.println("Failed to connect.");
+      return false;
+    }
   }
 
   Serial.println(WiFi.localIP());
@@ -100,12 +110,12 @@ void setup() {
   // Configure pin modes
   pinMode(tempPin, OUTPUT);
 
-  // Mount LittleFS
+  // Mount SPIFFS
   initFS();
 
-  // Load values saved in LittleFS
-  ssid = readFile(LittleFS, ssidPath);
-  pass = readFile(LittleFS, passPath);
+  // Load values saved in SPIFFS
+  ssid = readFile(SPIFFS, ssidPath);
+  pass = readFile(SPIFFS, passPath);
   Serial.println(ssid);
   Serial.println(pass);
   Serial.println(ip);
@@ -125,13 +135,13 @@ void setup() {
   if (initWiFi()) {
     // Route for root / web page
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-      request->send(LittleFS, "/index.html", "text/html");
+      request->send(SPIFFS, "/index.html", "text/html");
     });
 
-    server.serveStatic("/", LittleFS, "/");
+    server.serveStatic("/", SPIFFS, "/");
 
     server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request) {
-      request->send(LittleFS, "/index.html", "text/html");
+      request->send(SPIFFS, "/index.html", "text/html");
     });
 
     server.begin();
@@ -147,10 +157,10 @@ void setup() {
 
     // Web Server Root URL
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-      request->send(LittleFS, "/wifimanager.html", "text/html");
+      request->send(SPIFFS, "/wifimanager.html", "text/html");
     });
 
-    server.serveStatic("/", LittleFS, "/");
+    server.serveStatic("/", SPIFFS, "/");
 
     server.on("/", HTTP_POST, [](AsyncWebServerRequest *request) {
       int params = request->params();
@@ -163,8 +173,8 @@ void setup() {
             Serial.print("SSID set to: ");
             Serial.println(ssid);
             // Write file to save value
-            writeFile(LittleFS, ssidPath, ssid.c_str());
-            writeFileJson(LittleFS, jsonWifiPath, "SSID", ssid.c_str());
+            writeFile(SPIFFS, ssidPath, ssid.c_str());
+            writeFileJson(SPIFFS, jsonWifiPath, "SSID", ssid.c_str());
           }
           // HTTP POST pass value
           if (p->name() == PARAM_INPUT_2) {
@@ -172,8 +182,8 @@ void setup() {
             Serial.print("Password set to: ");
             Serial.println(pass);
             // Write file to save value
-            writeFile(LittleFS, passPath, pass.c_str());
-            writeFileJson(LittleFS, jsonWifiPath, "PASS", pass.c_str());
+            writeFile(SPIFFS, passPath, pass.c_str());
+            writeFileJson(SPIFFS, jsonWifiPath, "PASS", pass.c_str());
           }
         }
       }
@@ -201,6 +211,6 @@ void loop() {
     // ESP.restart();
   }
   // delay(1000);
-  // Serial.println(readFileJson(LittleFS, jsonWifiPath, "SSID"));
-  // Serial.println(readFileJson(LittleFS, jsonWifiPath, "PASS"));
+  // Serial.println(readFileJson(SPIFFS, jsonWifiPath, "SSID"));
+  // Serial.println(readFileJson(SPIFFS, jsonWifiPath, "PASS"));
 }
