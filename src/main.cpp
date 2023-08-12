@@ -27,8 +27,6 @@ String ip = "192.168.1.200";
 String gateway = "192.168.1.1";
 
 // File paths to save input values permanently
-const char *ssidPath = "/ssid.txt";
-const char *passPath = "/pass.txt";
 const char *jsonWifiPath = "/wifi.json";
 
 // Setting hostname
@@ -114,8 +112,8 @@ void setup() {
   initFS();
 
   // Load values saved in SPIFFS
-  ssid = readFile(SPIFFS, ssidPath);
-  pass = readFile(SPIFFS, passPath);
+  ssid = readFileJson(SPIFFS, jsonWifiPath, "SSID");
+  pass = readFileJson(SPIFFS, jsonWifiPath, "PASS");
   Serial.println(ssid);
   Serial.println(pass);
   Serial.println(ip);
@@ -169,7 +167,6 @@ void setup() {
             Serial.print("SSID set to: ");
             Serial.println(ssid);
             // Write file to save value
-            writeFile(SPIFFS, ssidPath, ssid.c_str());
             writeFileJson(SPIFFS, jsonWifiPath, "SSID", ssid.c_str());
           }
           // HTTP POST pass value
@@ -178,7 +175,6 @@ void setup() {
             Serial.print("Password set to: ");
             Serial.println(pass);
             // Write file to save value
-            writeFile(SPIFFS, passPath, pass.c_str());
             writeFileJson(SPIFFS, jsonWifiPath, "PASS", pass.c_str());
           }
         }
@@ -189,6 +185,7 @@ void setup() {
     });
     server.begin();
   }
+
   // Initialize ArduinoOTA with a hostname and start
   ArduinoOTA.setHostname(hostname);
   ArduinoOTA.onStart([]() { Serial.println("OTA update started"); });
@@ -210,7 +207,5 @@ void loop() {
     delay(5000);
     ESP.restart();
   }
-  // delay(1000);
-  // Serial.println(readFileJson(SPIFFS, jsonWifiPath, "SSID"));
-  // Serial.println(readFileJson(SPIFFS, jsonWifiPath, "PASS"));
+  delay(1000);
 }
